@@ -123,6 +123,7 @@ class ResultDialog(wx.Dialog):
 		inputSizer.Add(self.inputCtrl)
 		self.sendButton = wx.Button(self, label="Send")
 		self.sendButton.SetDefault()
+		self.sendButton.Disable()
 		self.sendButton.Bind(wx.EVT_BUTTON, self.onSend)
 		inputSizer.Add(self.sendButton)
 		mainSizer.Add(inputSizer)
@@ -156,8 +157,12 @@ class ResultDialog(wx.Dialog):
 		# Speak the rest of the response.
 		speech.speakMessage(self.speechBuffer)
 		self.speechBuffer = ""
+		self.sendButton.Enable()
 
 	def onSend(self, event):
+		if not self.sendButton.Enabled:
+			return
+		self.sendButton.Disable()
 		self.plugin._send(self.inputCtrl.Value)
 		self.outputCtrl.AppendText("\nUser: %s\n" % self.inputCtrl.Value)
 		self.inputCtrl.Clear()
