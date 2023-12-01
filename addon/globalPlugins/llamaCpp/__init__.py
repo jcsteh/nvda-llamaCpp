@@ -112,10 +112,10 @@ class ResultDialog(wx.Dialog):
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 		self.outputCtrl = wx.TextCtrl(
 			self,
-			size=(500, 500),
+			size=(1500, 1000),
 			style=wx.TE_MULTILINE | wx.TE_READONLY
 		)
-		mainSizer.Add(self.outputCtrl, flag=wx.EXPAND)
+		mainSizer.Add(self.outputCtrl, proportion=2, flag=wx.EXPAND)
 		inputSizer = wx.BoxSizer(wx.HORIZONTAL)
 		inputLabel = wx.StaticText(self, label="Ask a question")
 		inputSizer.Add(inputLabel)
