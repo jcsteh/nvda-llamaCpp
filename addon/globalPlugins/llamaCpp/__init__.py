@@ -128,25 +128,34 @@ class ResultDialog(wx.Dialog):
 		mainSizer.Add(inputSizer)
 		self.SetSizer(mainSizer)
 		mainSizer.Fit(self)
-		self.response = ""
+		self.isResponseStreaming = False
+		self.speechBuffer = ""
 
 	def addResponse(self, text):
 		# Add text as it comes in, but keep the user's cursor where it is.
 		pos = self.outputCtrl.InsertionPoint
-		if not self.response:
+		if not self.isResponseStreaming:
 			self.outputCtrl.AppendText("Llama: ")
+			self.isResponseStreaming = True
 		self.outputCtrl.AppendText(text)
 		self.outputCtrl.InsertionPoint = pos
-		self.response += text
+		self.speechBuffer += text
 		if not self.Shown:
 			self.Raise()
 			self.Show()
 			self.outputCtrl.SetFocus()
+		# We don't speak every token individually, as that is very jarring. However,
+		# we don't want to wait until the very end either. If there are 10 or more
+		# tokens, speak them.
+		if len(self.speechBuffer.split(" ")) >= 10:
+			speech.speakMessage(self.speechBuffer)
+			self.speechBuffer = ""
 
 	def responseDone(self):
-		# Speak the entire response when it's done.
-		speech.speakMessage(self.response)
-		self.response = ""
+		self.isResponseStreaming = False
+		# Speak the rest of the response.
+		speech.speakMessage(self.speechBuffer)
+		self.speechBuffer = ""
 
 	def onSend(self, event):
 		self.plugin._send(self.inputCtrl.Value)
