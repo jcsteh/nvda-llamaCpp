@@ -2,6 +2,7 @@
 # License: GNU General Public License
 
 import base64
+import io
 import json
 import os
 import sys
@@ -38,13 +39,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		pixels = sb.captureImage(
 			location.left, location.top, location.width, location.height
 		)
-		bmp = wx.EmptyBitmap(location.width, location.height, 32)
-		bmp.CopyFromBuffer(pixels, wx.BitmapBufferFormat_RGB32)
-		imgFile = tempfile.mktemp(prefix="nvda_llamaCpp_", suffix=".jpg")
-		# It'd be ideal if there were some way to do this without writing to disk.
-		bmp.SaveFile(imgFile, wx.BITMAP_TYPE_JPEG)
-		imgData = base64.b64encode(open(imgFile, "rb").read())
-		os.remove(imgFile)
+		img = wx.EmptyBitmap(location.width, location.height, 32)
+		img.CopyFromBuffer(pixels, wx.BitmapBufferFormat_RGB32)
+		img = img.ConvertToImage()
+		stream = io.BytesIO()
+		img.SaveFile(stream, wx.BITMAP_TYPE_JPEG)
+		imgData = base64.b64encode(stream.getvalue())
 		self._imgData = imgData.decode("UTF-8")
 		ui.message("Recognizing")
 		# Maintain a history of the conversation, as we have to re-send this with
