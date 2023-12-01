@@ -8,6 +8,7 @@ import os
 import sys
 import tempfile
 import threading
+import urllib.request
 import wx
 
 import api
@@ -19,10 +20,6 @@ import speech
 import ui
 from logHandler import log
 from scriptHandler import script
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "deps"))
-import requests
-sys.path.pop()
 
 URL = "http://localhost:8080/completion"
 PROMPT = "This is a conversation between User and Llama, a friendly chatbot. Llama is helpful, kind, honest, good at writing, and never fails to answer any requests immediately and with precision. Llama is especially good at describing images in great detail for users who can't see.\nUSER: [img-10] Please describe this image in detail.\nASSISTANT:"
@@ -63,17 +60,23 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def _bgQuery(self):
 		try:
-			resp = requests.post(URL, stream=True, json={
-				"prompt": self._history,
-				"stream": True,
-				"image_data": [
-					{"id": 10, "data": self._imgData}
-				],
-			})
-			for token in resp.iter_lines():
+			req = urllib.request.Request(
+				URL,
+				data=json.dumps({
+					"prompt": self._history,
+					"stream": True,
+					"image_data": [
+						{"id": 10, "data": self._imgData}
+					],
+				}).encode(),
+				headers={"Content-Type": "application/json"}
+			)
+			resp = urllib.request.urlopen(req)
+			for token in resp:
 				if self._thread is not threading.current_thread():
 					# This previous request was cancelled.
 					return
+				token = token.rstrip()
 				if not token:
 					continue
 				# Strip "data: " prefix.
