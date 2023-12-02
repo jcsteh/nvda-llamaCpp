@@ -13,7 +13,7 @@ However, any multi-modal model which supports image description should work.
 Currently, you need to download and run llama.cpp and the appropriate model yourself.
 The add-on will not do this for you.
 
-1. Install the [llama.cpp NVDA add-on](https://files.jantrid.net/llamaCpp-2023.1.nvda-addon).
+1. Install the [llama.cpp NVDA add-on](https://files.jantrid.net/llamaCpp.nvda-addon).
 2. If you have an Nvidia graphics adapter which supports CUDA, download these files:
 
     - https://github.com/ggerganov/llama.cpp/releases/download/b1575/cudart-llama-bin-win-cu11.7.1-x64.zip
