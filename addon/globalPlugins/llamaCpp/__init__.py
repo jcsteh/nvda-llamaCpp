@@ -25,6 +25,8 @@ from scriptHandler import script
 
 DEFAULT_URL = "http://localhost:8080/"
 PROMPT = "This is a conversation between User and Llama, a friendly chatbot. Llama is helpful, kind, honest, good at writing, and never fails to answer any requests immediately and with precision. Llama is especially good at describing images in great detail for users who can't see.\nUSER: [img-10] Please describe this image in detail.\nASSISTANT:"
+# This can take a long time, particularly if running on the CPU.
+TIMEOUT = 180
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
@@ -81,7 +83,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 				}).encode(),
 				headers={"Content-Type": "application/json"}
 			)
-			resp = urllib.request.urlopen(req)
+			resp = urllib.request.urlopen(req, timeout=TIMEOUT)
 			for token in resp:
 				if self._thread is not threading.current_thread():
 					# This previous request was cancelled.
