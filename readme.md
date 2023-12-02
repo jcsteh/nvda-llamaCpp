@@ -4,12 +4,12 @@
 - License: GNU General Public License
 
 This add-on allows you to use llama.cpp to obtain image descriptions and ask follow-up questions using AI models which support this.
-This is done locally on your computer; no data is sent to the internet.
+This can be done locally on your computer, in which case no data is sent to the internet.
 
 So far, this has been tested with the [LLaVA-1.5](https://llava-vl.github.io/) model.
 However, any multi-modal model which supports image description should work.
 
-## Usage Instructions
+## Local Usage Instructions
 Currently, you need to download and run llama.cpp and the appropriate model yourself.
 The add-on will not do this for you.
 
@@ -34,3 +34,19 @@ The add-on will not do this for you.
 
 7. In NVDA, press NVDA+shift+l to recognise the current navigator object.
     This will open a chat dialog where you can read the response and ask follow-up questions.
+
+## Using a Remote Server
+Sometimes, you may wish to run llama.cpp on a remote computer.
+For example, you might do this if you have a computer on a local network with a more powerful GPU.
+In this case, you can change the URL that this add-on uses to connect to the llama.cpp server.
+
+There isn't a settings dialog to configure this yet.
+In the interim, you can do the following:
+
+1. Open the NVDA Python Console by pressing NVDA+control+z.
+2. Enter the following command, replacing the URL in quotes with the URL for your llama.cpp server:
+
+    `config.conf["llamaCpp"] = {"url": "http://some.host:8080/"}`
+
+3. Press enter.
+4. Save your NVDA configuration.

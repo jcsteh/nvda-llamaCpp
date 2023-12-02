@@ -8,10 +8,12 @@ import os
 import sys
 import tempfile
 import threading
+import urllib.parse
 import urllib.request
 import wx
 
 import api
+import config
 import globalPluginHandler
 import gui
 import queueHandler
@@ -21,7 +23,7 @@ import ui
 from logHandler import log
 from scriptHandler import script
 
-URL = "http://localhost:8080/completion"
+DEFAULT_URL = "http://localhost:8080/"
 PROMPT = "This is a conversation between User and Llama, a friendly chatbot. Llama is helpful, kind, honest, good at writing, and never fails to answer any requests immediately and with precision. Llama is especially good at describing images in great detail for users who can't see.\nUSER: [img-10] Please describe this image in detail.\nASSISTANT:"
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
@@ -42,6 +44,14 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		stream = io.BytesIO()
 		img.SaveFile(stream, wx.BITMAP_TYPE_JPEG)
 		imgData = base64.b64encode(stream.getvalue())
+		if (
+			(confSect := config.conf.get("llamaCpp")) and
+			(confUrl := confSect.get("url"))
+		):
+			self._url = confUrl
+		else:
+			self._url = DEFAULT_URL
+		self._url = urllib.parse.urljoin(self._url, "completion")
 		self._imgData = imgData.decode("UTF-8")
 		ui.message("Recognizing")
 		# Maintain a history of the conversation, as we have to re-send this with
@@ -61,7 +71,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def _bgQuery(self):
 		try:
 			req = urllib.request.Request(
-				URL,
+				self._url,
 				data=json.dumps({
 					"prompt": self._history,
 					"stream": True,
