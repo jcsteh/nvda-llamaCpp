@@ -1,6 +1,7 @@
 # Copyright 2023 James Teh
 # License: GNU General Public License
 
+import addonHandler
 import base64
 import io
 import json
@@ -28,6 +29,16 @@ PROMPT = "This is a conversation between User and Llama, a friendly chatbot. Lla
 # This can take a long time, particularly if running on the CPU.
 TIMEOUT = 180
 
+_curAddon = addonHandler.getCodeAddon()
+addonName = _curAddon.name.lower()
+addonSummary = _curAddon.manifest['summary']
+
+confspec = {
+	"url": f"string(default={DEFAULT_URL})",
+}
+config.conf.spec[addonName] = confspec
+
+
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	@script(
@@ -46,14 +57,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		stream = io.BytesIO()
 		img.SaveFile(stream, wx.BITMAP_TYPE_JPEG)
 		imgData = base64.b64encode(stream.getvalue())
-		if (
-			(confSect := config.conf.get("llamaCpp")) and
-			(confUrl := confSect.get("url"))
-		):
-			self._url = confUrl
-		else:
-			self._url = DEFAULT_URL
-		self._url = urllib.parse.urljoin(self._url, "completion")
+		self._url = urllib.parse.urljoin(config.conf[addonName]["url"], "completion")
 		self._imgData = imgData.decode("UTF-8")
 		ui.message("Recognizing")
 		# Maintain a history of the conversation, as we have to re-send this with
