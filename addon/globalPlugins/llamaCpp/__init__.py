@@ -16,11 +16,12 @@ import wx
 import api
 import config
 import globalPluginHandler
-import gui
+import gui.settingsDialogs
 import queueHandler
 import screenBitmap
 import speech
 import ui
+from gui import guiHelper
 from logHandler import log
 from scriptHandler import script
 
@@ -40,6 +41,13 @@ config.conf.spec[addonName] = confspec
 
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		gui.settingsDialogs.NVDASettingsDialog.categoryClasses.append(LlamaCppSettingsPanel)
+
+	def terminate(self):
+		gui.settingsDialogs.NVDASettingsDialog.categoryClasses.remove(LlamaCppSettingsPanel)
 
 	@script(
 		gesture="kb:NVDA+shift+l",
@@ -190,3 +198,18 @@ class ResultDialog(wx.Dialog):
 		self.plugin._finish()
 		self.plugin = None
 		self.Destroy()
+
+
+class LlamaCppSettingsPanel(gui.settingsDialogs.SettingsPanel):
+	title = "llama.cpp"
+
+	def makeSettings(self, sizer):
+		sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=sizer)
+		self.urlEdit = sHelper.addLabeledControl("&URL", wx.TextCtrl)
+		self.urlEdit.Value = config.conf[addonName]["url"]
+
+	def postInit(self):
+		self.urlEdit.SetFocus()
+
+	def onSave(self):
+		config.conf[addonName]["url"] = self.urlEdit.Value

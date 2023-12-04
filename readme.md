@@ -39,14 +39,4 @@ The add-on will not do this for you.
 Sometimes, you may wish to run llama.cpp on a remote computer.
 For example, you might do this if you have a computer on a local network with a more powerful GPU.
 In this case, you can change the URL that this add-on uses to connect to the llama.cpp server.
-
-There isn't a settings dialog to configure this yet.
-In the interim, you can do the following:
-
-1. Open the NVDA Python Console by pressing NVDA+control+z.
-2. Enter the following command, replacing the URL in quotes with the URL for your llama.cpp server:
-
-    `config.conf["llamaCpp"] = {"url": "http://some.host:8080/"}`
-
-3. Press enter.
-4. Save your NVDA configuration.
+You can do this in the llama.cpp category in the NVDA Settings dialog.
